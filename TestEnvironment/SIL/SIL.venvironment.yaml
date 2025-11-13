@@ -1,8 +1,5 @@
 version: 3.0.0
 
-includes:
-  - ../venvironment.yaml
-
 scenarios:
   - name: SUT_L1
     variables:
@@ -10,6 +7,7 @@ scenarios:
         value: ../../SystemUnderTest/L1_BswEmulation/SUT
       - name: Adaptation_DIR
         value: L1_BswEmulation/AdaptationLayer
+        
   - name: SUT_L3
     variables:
       - name: SUT_DIR
@@ -17,14 +15,26 @@ scenarios:
       - name: Adaptation_DIR
         value: L3_Integration/AdaptationLayer
 
+variables:
+  - name: AbstractEnv_DIR
+    type: path
+    value: ../SharedResources/ApplicationModels/TestEnvironmentControl
+    
+system-variables:
+  - file-path: ../SharedResources/SysVars/TestEnvironment.vsysvar
+  
 datasources:
   - file-path:  ${SUT_DIR}/FanControlECU.vCODM
     when: SCENARIO_NAME == "SUT_L1"
+  - file-path: ../SharedResources/ApplicationModels/FanModel/Fan.vcdl
+  - file-path: ${AbstractEnv_DIR}/TestEnvironmentAbstraction.vcdl
 
 application-models:
   - file-path: ${Adaptation_DIR}/CAPLBinding.can
   - file-path: ${SUT_DIR}/FanControlECU.vmodule
     when: SCENARIO_NAME == "SUT_L1"
+  - file-path: ../SharedResources/ApplicationModels/FanModel/Fan.can
+  - file-path: ${AbstractEnv_DIR}/TestEnvironmentControl.can
 
 databases:
   - name: Comfort
