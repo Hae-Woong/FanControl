@@ -29,7 +29,7 @@ jobs:
         with:
           path: |
             ./SystemUnderTest/L3_Integration/SUT
-          key: ${{ hashFiles('./SystemUnderTest/L1_BswEmulation/FanControlECU/Appl/Source', './SystemUnderTest/L1_BswEmulation/FanControlECU/Appl/GenDataVtt', './SystemUnderTest/L3_Integration/FanControl.vttmake', '"./SystemUnderTest/Software/DaVinci/FanControl.dpa') }}
+          key: ${{ hashFiles('./SystemUnderTest/Software/**) }}
 
       - name: Run vVIRTUALtarget
         if: steps.cache-sut.outputs.cache-hit != 'true'
@@ -46,7 +46,7 @@ jobs:
         if: always()
         with:
           name: ECU_Logs
-          path: ./SystemUnderTest/L3_Integration/FanControlECU/Log
+          path: ./SystemUnderTest/L3_Integration/Log  
           retention-days: 7
 
   build-simulation:
