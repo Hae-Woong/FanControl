@@ -72,10 +72,10 @@
       <SourceFiles>
         <File>..\Software\Source\CtApController.c</File>
         <File>..\Software\Source\CtCddIoHwAb.c</File>
-        <File>..\Software\VTT.SIP.ASR4.R29\Components\VStdLib\Implementation\vstdlib.c</File>
+        <File>D:\__action-runner_FanControl\VTT.SIP.ASR4.R29\Components\VStdLib\Implementation\vstdlib.c</File>
       </SourceFiles>
       <IncludeFolders>
-        <IncludeFolder Configuration="All">..\Software\VTT.SIP.ASR4.R29\Components\VStdLib\Implementation</IncludeFolder>
+        <IncludeFolder Configuration="All">D:\__action-runner_FanControl\VTT.SIP.ASR4.R29\Components\VStdLib\Implementation</IncludeFolder>
         <IncludeFolder Configuration="All">FanControlECU\Appl\Include</IncludeFolder>
       </IncludeFolders>
       <PreprocessorDefinitions>
