@@ -7,13 +7,24 @@ scenarios:
         value: ../../SystemUnderTest/L1_BswEmulation/SUT
       - name: Adaptation_DIR
         value: L1_BswEmulation/AdaptationLayer
-        
+      - name: Scalingfactor
+        value: as-fast-as-possible
+ 
   - name: SUT_L3
     variables:
       - name: SUT_DIR
         value: ../../SystemUnderTest/L3_Integration/SUT
       - name: Adaptation_DIR
         value: L3_Integration/AdaptationLayer
+      - name: Scalingfactor
+        value: 0.5
+
+global-settings:
+  working-mode:
+    time-source: internal-scaled
+    time-scaling-factor: ${Scalingfactor}
+    default-network-mapping: internal-simulator
+
 
 variables:
   - name: AbstractEnv_DIR
