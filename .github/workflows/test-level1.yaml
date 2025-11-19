@@ -119,7 +119,7 @@ jobs:
             & "$env:TestReportViewer_InstallDir\ReportViewerCli.exe" -r $_ -xu
           }
 
-      - name: Display test results
+      - name: Display L1 test results
         uses: dorny/test-reporter@v1.9.1
         with:
           name: L1 Test results                          # Name of the check run which will be created
