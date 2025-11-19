@@ -118,7 +118,7 @@ jobs:
           Get-ChildItem . -Filter *.vtestreport | ForEach-Object { 
             $reportName = "$($_.BaseName)_L3_xunit.xml"
             Write-Host "Converting $($_.Name) -> $reportName"
-            & "$env:TestReportViewer_InstallDir\ReportViewerCli.exe" -r $_.FullName -xu -o $reportName
+            & "$env:TestReportViewer_InstallDir\ReportViewerCli.exe" -r $_.FullName -xu="$reportName"
 
             if (Test-Path $reportName) {
               Write-Host "Successfully created: $reportName"
