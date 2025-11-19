@@ -107,7 +107,7 @@ jobs:
     name: Display test report
     if: ${{ !cancelled() }}
     needs: run-tests-simulation
-    runs-on: lvl1
+    runs-on: lvl3
     steps:
     - name: Convert all test reports to XUnit format
       shell: pwsh
