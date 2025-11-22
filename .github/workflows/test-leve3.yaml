@@ -116,32 +116,34 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: test-results-lvl3-${{ matrix.TESTNAME }}
+          path: ./simulation/TestReports/${{ matrix.TESTNAME }}
 
       - name: Convert all test reports to XUnit format
-        working-directory: ./simulation/TestReports/
+        working-directory: ./simulation/TestReports/${{ matrix.TESTNAME }}
         shell: pwsh
         env:
           TestReportViewer_InstallDir: 'C:\Program Files\Vector CANoe Server Edition 19\Exec64'
         run: |
-          Get-ChildItem . -Filter *.vtestreport | ForEach-Object { 
+          $reportDir = "./simulation/TestReports/${{ matrix.TESTNAME }}"
+          Get-ChildItem $reportDir -Filter *.vtestreport | ForEach-Object { 
             $reportName = "${{ matrix.TESTNAME }}_L3_xunit.xml"
             Write-Host "Converting $($_.Name) -> $reportName"
-            & "$env:TestReportViewer_InstallDir\ReportViewerCli.exe" -r $_.FullName -xu="$reportName"
+            & "$env:TestReportViewer_InstallDir\ReportViewerCli.exe" -r $_.FullName -xu="$reportDir\$reportName"
 
-            if (Test-Path $reportName) {
-              Write-Host "Successfully created: $reportName"
+            if (Test-Path "$reportDir\$reportName") {
+            Write-Host "Successfully created: $reportName"
             } else {
-              Write-Host "Failed to create: $reportName"
+             Write-Host "Failed to create: $reportName" -ForegroundColor Red
+            Exit 1
             }
-          }
 
       - name: Display L3 test results
         uses: dorny/test-reporter@v1.9.1
         with:
-          name: L3 Test results                             # Name of the check run which will be created
+          name: L3 Test results - ${{ matrix.TESTNAME }}                                                         # Name of the check run which will be created
           artifact: test-results-lvl3-${{ matrix.TESTNAME }}                     
-          path: "./simulation/TestReports/*_L3_xunit.xml"   # Path to test results
-          reporter: java-junit                              # Format of test results
-          fail-on-error: false                              # Don't mark as failing job if test
+          path: "./simulation/TestReports/${{ matrix.TESTNAME }}/*_L3_xunit.xml"    # Path to test results
+          reporter: java-junit                                                      # Format of test results
+          fail-on-error: false                                                      # Don't mark as failing job if test
 
 
