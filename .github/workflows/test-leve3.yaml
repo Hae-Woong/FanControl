@@ -129,7 +129,7 @@ jobs:
             Write-Host "Converting $($_.Name) -> $reportName"
             & "$env:TestReportViewer_InstallDir/ReportViewerCli.exe" -r $_.FullName -xu="./$reportName"
 
-            if (Test-Path ".\$reportName") {
+            if (Test-Path "./$reportName") {
             Write-Host "Successfully created: $reportName"
             } else {
              Write-Host "Failed to create: $reportName" -ForegroundColor Red
@@ -142,7 +142,7 @@ jobs:
         with:
           name: L3 Test results - ${{ matrix.TESTNAME }}                                                 # Name of the check run which will be created
           artifact: test-results-lvl3-${{ matrix.TESTNAME }}                     
-          path: "./simulation/TestReports/${{ matrix.TESTNAME }}_L3_xunit.xml"                           # Path to test results
+          path: "./simulation/TestReports/*_L3_xunit.xml"                           # Path to test results
           reporter: java-junit                                                                           # Format of test results
           fail-on-error: false                                                                           # Don't mark as failing job if test
 
