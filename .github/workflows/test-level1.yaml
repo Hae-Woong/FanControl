@@ -91,7 +91,7 @@ jobs:
         if: ${{ !cancelled() }}
         uses: actions/upload-artifact@v4
         with:
-          name: test-results-lvl1
+          name: test-results-lvl1-${{ matrix.TESTNAME }}
           path: |
             ./simulation/TestReports/
           retention-days: 7
@@ -112,7 +112,7 @@ jobs:
       - name: Download test results artifact
         uses: actions/download-artifact@v4
         with:
-          name: test-results-lvl1
+          name: test-results-lvl1-*
 
       - name: Convert all test reports to XUnit format
         working-directory: ./simulation/TestReports/
@@ -136,7 +136,7 @@ jobs:
         uses: dorny/test-reporter@v1.9.1
         with:
           name: L1 Test results                             # Name of the check run which will be created
-          artifact: test-results-lvl1                     
+          artifact: test-results-lvl1-*                     
           path: "./simulation/TestReports/*_L1_xunit.xml"   # Path to test results
           reporter: java-junit                              # Format of test results
           fail-on-error: 'false'                            # Don't mark as failing job if test 
