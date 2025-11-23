@@ -104,12 +104,28 @@ jobs:
           path: ./simulation/*.txt
 
   display-test-report-level1:
-    name: Display test report (L1)
-    if: ${{ !cancelled() }}
-    needs: run-tests-simulation
-    runs-on: lvl1
-    steps:
-    
+  name: Display test report (L1)
+  if: ${{ !cancelled() }}
+  needs: run-tests-simulation
+  runs-on: lvl1
+  steps:
+
+    - name: Clean previous L1 workspace
+      shell: pwsh
+      run: |
+        if (Test-Path "./simulation/TestReports") {
+          Write-Host "Cleaning ./simulation/TestReports"
+          Remove-Item "./simulation/TestReports" -Recurse -Force
+        }
+        New-Item -ItemType Directory -Path "./simulation/TestReports" | Out-Null
+
+    - name: Download test report artifacts
+      uses: actions/download-artifact@v4
+      with:
+        pattern: "Test Reports * - lvl1"   
+        path: ./simulation/TestReports
+        merge-multiple: false   
+
     - name: Convert all test reports to XUnit format
       shell: pwsh
       working-directory: ./simulation/TestReports
@@ -123,28 +139,43 @@ jobs:
         }
 
         foreach ($r in $reports) {
-         $tempFile =  Join-Path $r.DirectoryName ("$($r.BaseName)_xunit.xml")
-         $finalFile = Join-Path $r.DirectoryName ("$($r.BaseName)_L1_xunit.xml")
+          $tempFile = Join-Path $r.DirectoryName ("$($r.BaseName)_xunit.xml")
+          $finalFile = Join-Path $r.DirectoryName ("$($r.BaseName)_L1_xunit.xml")
 
-         Write-Host ("Converting $($r.Name) -> $finalFile")
-         & "$env:TestReportViewer_InstallDir\ReportViewerCli.exe" -r $r.FullName -xu $tempFile
+          Write-Host ("Converting $($r.Name) -> $finalFile")
+          & "$env:TestReportViewer_InstallDir\ReportViewerCli.exe" -r $r.FullName -xu $tempFile
 
-         if (Test-Path $tempFile) {
-           Rename-Item -Path $tempFile -NewName $finalFile -Force
-           Write-Host "Successfully created: $finalFile"
-           } else {
-           Write-Host "Failed to create: $finalFile"
-          Exit 1
-            }
+          if (Test-Path $tempFile) {
+            Rename-Item -Path $tempFile -NewName $finalFile -Force
+            Write-Host "Successfully created: $finalFile"
+          } else {
+            Write-Host "Failed to create: $finalFile"
+            Exit 1
           }
+        }
 
-    - name: Display L1 test results
-      uses: dorny/test-reporter@v1.9.1
-      if: always()
-      with:
-        name: L1 Test results                             # Name of the check run which will be created
-        path: "./simulation/TestReports/*_L1_xunit.xml"   # Path to test results
-        reporter: java-junit                              # Format of test results
-        fail-on-error: false                              # Don't mark as failing job if test
+    - name: Display L1 test results summary
+      shell: pwsh
+      run: |
+        $results = Get-ChildItem ./simulation/TestReports -Filter "*_L1_xunit.xml" -Recurse
+        if ($results.Count -eq 0) {
+          Write-Host "No converted test reports found."
+          Exit 0
+        }
+
+        Write-Host "Test result files:"
+        $results | ForEach-Object { Write-Host $_.FullName }
+
+        Write-Host "`n==== Test Summary (Runner-specific) ===="
+        foreach ($file in $results) {
+          Write-Host "Summary for $($file.Name):"
+          $xml = [xml](Get-Content $file.FullName)
+          $total = $xml.testsuite.tests
+          $failures = $xml.testsuite.failures
+          $errors = $xml.testsuite.errors
+          $skipped = $xml.testsuite.skipped
+          Write-Host "Total: $total, Failures: $failures, Errors: $errors, Skipped: $skipped"
+        }
+
 
 
