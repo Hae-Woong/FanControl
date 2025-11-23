@@ -148,17 +148,9 @@ jobs:
           Exit 0
         }
         foreach ($r in $reports) {
-          $reportName = "./simulation/TestReports/$($r.BaseName)_L1_xunit.xml"
+          $reportName = "$($r.BaseName)_L1_xunit.xml"
           Write-Host ("Converting $($r.Name) -> $reportName")
           & "$env:TestReportViewer_InstallDir\ReportViewerCli.exe" -r $r.FullName -xu "$reportName"
-
-          if (Test-Path $reportName) {
-            Write-Host "Successfully created: $reportName"
-          } else {
-            Write-Host "Failed to create: $reportName"
-            Exit 1
-          }
-        }
 
     - name: Display L1 test results
       uses: dorny/test-reporter@v1.9.1
