@@ -103,15 +103,21 @@ jobs:
           name: Log Files ${{ matrix.TESTNAME }}
           path: ./simulation/*.txt
 
-  display-test-report:
-    name: Display test report
+  display-test-report-level1:
+    name: Display test report (L1)
     if: ${{ !cancelled() }}
     needs: run-tests-simulation
     runs-on: lvl1
     steps:
+    - uses: actions/download-artifact@v4
+      with:
+        pattern: "Test Reports * - lvl1"   
+        path: ./simulation/TestReports
+        merge-multiple: true
+
     - name: Convert all test reports to XUnit format
-      working-directory: ./simulation/TestReports
       shell: pwsh
+      working-directory: ./simulation/TestReports
       env:
         TestReportViewer_InstallDir: 'C:\Program Files\Vector CANoe Server Edition 19\Exec64'
       run: |
@@ -120,6 +126,7 @@ jobs:
           Write-Host "No .vtestreport files found. Skipping conversion."
           Exit 0
         }
+
         foreach ($r in $reports) {
          $tempFile =  Join-Path $r.DirectoryName ("$($r.BaseName)_xunit.xml")
          $finalFile = Join-Path $r.DirectoryName ("$($r.BaseName)_L1_xunit.xml")
@@ -138,6 +145,7 @@ jobs:
 
     - name: Display L1 test results
       uses: dorny/test-reporter@v1.9.1
+      if: always()
       with:
         name: L1 Test results                             # Name of the check run which will be created
         path: "./simulation/TestReports/*_L1_xunit.xml"   # Path to test results

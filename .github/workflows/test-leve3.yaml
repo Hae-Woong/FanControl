@@ -104,12 +104,18 @@ jobs:
           path: ./simulation/*.txt
 
  
-  display-test-report:
+  display-test-report-level3:
     name: Display test report (L3)
     if: ${{ !cancelled() }}
     needs: run-tests-simulation
     runs-on: lvl3
     steps:
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: "Test Reports * - lvl3"   
+          path: ./simulation/TestReports
+          merge-multiple: true
+
       - name: Convert all test reports to XUnit format
         working-directory: ./simulation/TestReports
         shell: pwsh
