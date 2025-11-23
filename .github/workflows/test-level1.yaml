@@ -110,22 +110,6 @@ jobs:
     runs-on: lvl1
     steps:
 
-      - name: Clean previous L1 workspace
-        shell: pwsh
-        run: |
-          if (Test-Path "./simulation/TestReports") {
-          Write-Host "Cleaning ./simulation/TestReports"
-          Remove-Item "./simulation/TestReports" -Recurse -Force
-          }
-          New-Item -ItemType Directory -Path "./simulation/TestReports" | Out-Null
-
-      - name: Download test report artifacts
-        uses: actions/download-artifact@v4
-        with:
-          pattern: "Test Reports * - lvl1"   
-          path: ./simulation/TestReports
-          merge-multiple: false   
-
       - name: Convert all test reports to XUnit format
         shell: pwsh
         working-directory: ./simulation/TestReports
@@ -154,25 +138,11 @@ jobs:
             }
           }
 
-      - name: Display L1 test results summary
-        shell: pwsh
-        run: |
-          $results = Get-ChildItem ./simulation/TestReports -Filter "*_L1_xunit.xml" -Recurse
-          if ($results.Count -eq 0) {
-          Write-Host "No converted test reports found."
-          Exit 0
-          }
-
-          Write-Host "Test result files:"
-          $results | ForEach-Object { Write-Host $_.FullName }
-
-          Write-Host "`n==== Test Summary (Runner-specific) ===="
-          foreach ($file in $results) {
-          Write-Host "Summary for $($file.Name):"
-          $xml = [xml](Get-Content $file.FullName)
-          $total = $xml.testsuite.tests
-          $failures = $xml.testsuite.failures
-          $errors = $xml.testsuite.errors
-          $skipped = $xml.testsuite.skipped
-          Write-Host "Total: $total, Failures: $failures, Errors: $errors, Skipped: $skipped"
-          }
+      - name: Display L1 test results
+        uses: dorny/test-reporter@v1.9.1
+        if: always()
+        with:
+          name: L1 Test results 
+          path: "./simulation/TestReports/*_L1_xunit.xml"
+          reporter: java-junit
+          fail-on-error: false
