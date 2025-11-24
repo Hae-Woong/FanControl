@@ -31,6 +31,16 @@ jobs:
             ./SystemUnderTest/L3_Integration/SUT
           key: ${{ hashFiles('./SystemUnderTest/Software/**') }}
 
+      - name: Create a vttMake file 
+        if: steps.cache-sut.outputs.cache-hit != 'true'  
+        run: |
+          &"$env:vVIRTUALtarget_InstallDir\vttproj2vttmake.exe" -i ./SystemUnderTest/L3_Integration/FanControl.vttproj -o ./SystemUnderTest/L3_Integration/FanControl.vttmake;
+          if(-Not $?)
+          {
+            Write-Host "Create VttMake File step failed." -ForegroundColor red
+            Exit -1
+          } 
+
       - name: Run vVIRTUALtarget
         if: steps.cache-sut.outputs.cache-hit != 'true'
         run: |

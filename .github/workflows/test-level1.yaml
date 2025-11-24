@@ -30,6 +30,16 @@ jobs:
           path: |
             ./SystemUnderTest/L1_BswEmulation/SUT
           key: ${{ hashFiles('./SystemUnderTest/L1_BswEmulation/FanControlECU/Appl/Source', './SystemUnderTest/L1_BswEmulation/FanControlECU/Appl/GenDataVtt', './SystemUnderTest/L1_BswEmulation/FanControl.vttmake', './SystemUnderTest/Software/DeveloperConfig/Emulation/FanControl.arxml', './SharedResources/Diagnostics/FanControl_ECU.cdd') }}
+      
+      - name: Create a vttMake file 
+        if: steps.cache-sut.outputs.cache-hit != 'true'  
+        run: |
+          &"$env:vVIRTUALtarget_InstallDir\vttproj2vttmake.exe" -i ./SystemUnderTest/L1_BswEmulation/FanControl.vttproj; -o ./SystemUnderTest/L1_BswEmulation/FanControl.vttmake;
+          if(-Not $?)
+          {
+            Write-Host "Create VttMake File step failed." -ForegroundColor red
+            Exit -1
+          } 
 
       - name: Run vVIRTUALtarget
         if: steps.cache-sut.outputs.cache-hit != 'true'
@@ -37,7 +47,7 @@ jobs:
           &"$env:vVIRTUALtarget_InstallDir\VttMake.exe" make ./SystemUnderTest/L1_BswEmulation/FanControl.vttmake;
           if(-Not $?)
           {
-            Write-Host "VttMake step failed." -ForegroundColor red
+            Write-Host "Create vECU from VttMake step failed." -ForegroundColor red
             Exit -1
           } 
 
