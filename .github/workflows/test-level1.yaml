@@ -23,12 +23,6 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4        
 
-      - name: Fix safe directory
-        shell: pwsh
-        run: |
-          git config --global --add safe.directory $env:GITHUB_WORKSPACE
-          git submodule foreach --recursive "git config --global --add safe.directory $toplevel"
-
       - name: Cache SUT
         id: cache-sut
         continue-on-error: true  
@@ -154,6 +148,12 @@ jobs:
             Exit 1
             }
           }
+
+      - name: Fix safe directory
+        shell: pwsh
+        run: |
+          git config --global --add safe.directory $env:GITHUB_WORKSPACE
+          git submodule foreach --recursive "git config --global --add safe.directory $toplevel"
 
       - name: Display L1 test results
         uses: dorny/test-reporter@v1.9.1

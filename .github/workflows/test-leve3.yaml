@@ -29,10 +29,6 @@ jobs:
           git config --global --add safe.directory $env:GITHUB_WORKSPACE
           git submodule foreach --recursive "git config --global --add safe.directory $toplevel"
 
-      - name: Fix safe directory for Git
-        run: |
-          git config --global --add safe.directory "$GITHUB_WORKSPACE"      
-
       - name: Cache SUT
         id: cache-sut
         continue-on-error: true  
@@ -159,6 +155,12 @@ jobs:
               }
             } 
       
+      - name: Fix safe directory
+        shell: pwsh
+        run: |
+          git config --global --add safe.directory $env:GITHUB_WORKSPACE
+          git submodule foreach --recursive "git config --global --add safe.directory $toplevel"
+
       - name: Display L3 test results
         uses: dorny/test-reporter@v1.9.1
         if: always()
